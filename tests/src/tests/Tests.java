@@ -19,36 +19,36 @@ import org.magland.wfs.WFSClient;
  * @author magland
  */
 public class Tests extends Application {
-	
+
 	@Override
 	public void start(Stage primaryStage) {
-		
-		String fshost="";
+
+		String fshost = "";
 		if (JUtils.connectedToInternet()) {
-			fshost="97.107.129.125:8080";
+			fshost = "97.107.129.125:8080";
 			//fshost="localhost:8006";
 		} else {
 			System.err.println("Not connected to the internet.");
-			fshost="localhost:8006";
+			fshost = "localhost:8006";
 		}
-		
+
 		//WFSClient CC = new WFSClient("localhost:8006", "LesionProbe", "");
 		WFSClient CC = new WFSClient(fshost, "fetalmri", "");
-		
-		DoubleWFSBrowser BB=new DoubleWFSBrowser();
+
+		DoubleWFSBrowser BB = new DoubleWFSBrowser();
 		BB.addOpenFileHandler(new MdaOpenFileHandler());
 		BB.setClient(CC);
 		BB.initialize();
-		
+
 		StackPane root = new StackPane();
 		root.getChildren().add(BB);
-		
+
 		Scene scene = new Scene(root, 300, 250);
-		
+
 		primaryStage.setTitle("Hello World!");
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		
+
 //		BB.onSelectedItemChanged(()->{
 //			System.out.println(wfs_browser.selectedItemPath());
 //		});
@@ -63,5 +63,5 @@ public class Tests extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
+
 }

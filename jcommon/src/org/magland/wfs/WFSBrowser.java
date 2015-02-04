@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
@@ -21,10 +20,10 @@ public class WFSBrowser extends TreeView {
 	WFSBrowserItem m_root = null;
 	WFSClient m_client = null;
 	CallbackHandler CH = new CallbackHandler();
-	Boolean m_folders_expandable=true;
-	String m_base_path="";
-	Boolean m_show_files=true;
-	List<OpenFileHandler> m_open_file_handlers=new ArrayList<>();
+	Boolean m_folders_expandable = true;
+	String m_base_path = "";
+	Boolean m_show_files = true;
+	List<OpenFileHandler> m_open_file_handlers = new ArrayList<>();
 
 	public WFSBrowser() {
 		this.setShowRoot(false);
@@ -36,41 +35,39 @@ public class WFSBrowser extends TreeView {
 			}
 			CH.trigger("selected-item-changed", true);
 		});
-		
-		this.setOnMouseClicked(evt->{
-			if (evt.getClickCount()==2) {
+
+		this.setOnMouseClicked(evt -> {
+			if (evt.getClickCount() == 2) {
 				if (this.selectedItemIsDirectory()) {
-					CH.trigger("folder-activated",true);
-				}
-				else {
+					CH.trigger("folder-activated", true);
+				} else {
 					CH.trigger("item-activated", true);
 				}
 			}
 		});
-		
-		this.setOnKeyPressed(evt->{
-			if (evt.getCode()==KeyCode.ENTER) {
+
+		this.setOnKeyPressed(evt -> {
+			if (evt.getCode() == KeyCode.ENTER) {
 				if (this.selectedItemIsDirectory()) {
-					CH.trigger("folder-activated",true);
-				}
-				else {
+					CH.trigger("folder-activated", true);
+				} else {
 					CH.trigger("item-activated", true);
 				}
 			}
 		});
-		
-		this.onItemActivated(()->{
-			String path=this.selectedItemPath();
-			String suf=JUtils.getFileSuffix(path);
-			for (int i=m_open_file_handlers.size()-1; i>=0; i--) {
-				OpenFileHandler handler=m_open_file_handlers.get(i);
+
+		this.onItemActivated(() -> {
+			String path = this.selectedItemPath();
+			String suf = JUtils.getFileSuffix(path);
+			for (int i = m_open_file_handlers.size() - 1; i >= 0; i--) {
+				OpenFileHandler handler = m_open_file_handlers.get(i);
 				if (handler.fileTypes().contains(suf)) {
 					handler.open(m_client, path);
 					return;
 				}
 			}
 		});
-		
+
 		this.addOpenFileHandler(new TextOpenFileHandler());
 
 	}
@@ -78,27 +75,27 @@ public class WFSBrowser extends TreeView {
 	public void setClient(WFSClient client) {
 		m_client = client;
 	}
-	
+
 	public WFSClient client() {
 		return m_client;
 	}
-	
+
 	public void setFoldersExpandable(Boolean val) {
-		m_folders_expandable=val;
+		m_folders_expandable = val;
 	}
-	
+
 	public void setBasePath(String path) {
-		m_base_path=path;
+		m_base_path = path;
 	}
-	
+
 	public void setShowFiles(Boolean val) {
-		m_show_files=val;
+		m_show_files = val;
 	}
-	
+
 	public void addOpenFileHandler(OpenFileHandler handler) {
 		m_open_file_handlers.add(handler);
 	}
-	
+
 	public void clearOpenFileHandlers() {
 		m_open_file_handlers.clear();
 	}
@@ -106,6 +103,7 @@ public class WFSBrowser extends TreeView {
 	public void initialize() {
 		refresh();
 	}
+
 	public void refresh() {
 		m_root = new WFSBrowserItem();
 		m_root.setPath(m_base_path);
@@ -117,8 +115,9 @@ public class WFSBrowser extends TreeView {
 	WFSBrowserItem get_selected_item() {
 		return (WFSBrowserItem) this.getSelectionModel().getSelectedItem();
 	}
+
 	public String selectedItemPath() {
-		WFSBrowserItem item=get_selected_item();
+		WFSBrowserItem item = get_selected_item();
 		if (item == null) {
 			return "";
 		}
@@ -126,7 +125,7 @@ public class WFSBrowser extends TreeView {
 	}
 
 	public Boolean selectedItemIsDirectory() {
-		WFSBrowserItem item=get_selected_item();
+		WFSBrowserItem item = get_selected_item();
 		if (item == null) {
 			return false;
 		}
@@ -136,9 +135,11 @@ public class WFSBrowser extends TreeView {
 	public void onSelectedItemChanged(Runnable callback) {
 		CH.bind("selected-item-changed", callback);
 	}
+
 	public void onItemActivated(Runnable callback) {
 		CH.bind("item-activated", callback);
 	}
+
 	public void onFolderActivated(Runnable callback) {
 		CH.bind("folder-activated", callback);
 	}
@@ -148,7 +149,7 @@ public class WFSBrowser extends TreeView {
 		String m_path = "";
 		Boolean m_first_get_children = true;
 		Boolean m_is_directory = false;
-		Boolean m_checked_and_does_not_have_children=false;
+		Boolean m_checked_and_does_not_have_children = false;
 
 		public WFSBrowserItem() {
 		}
@@ -185,7 +186,9 @@ public class WFSBrowser extends TreeView {
 
 		@Override
 		public boolean isLeaf() {
-			if (m_checked_and_does_not_have_children) return true;
+			if (m_checked_and_does_not_have_children) {
+				return true;
+			}
 			if (!m_folders_expandable) {
 				return (!m_path.equals(m_base_path));
 			}
@@ -194,8 +197,12 @@ public class WFSBrowser extends TreeView {
 
 		private ObservableList<WFSBrowserItem> build_children() {
 			ObservableList<WFSBrowserItem> ret = FXCollections.observableArrayList();
-			if (!m_is_directory) return ret;
-			if ((!m_folders_expandable)&&(!m_path.equals(m_base_path))) return ret;
+			if (!m_is_directory) {
+				return ret;
+			}
+			if ((!m_folders_expandable) && (!m_path.equals(m_base_path))) {
+				return ret;
+			}
 
 			SJO tmp1 = m_client.readDirSync(m_path);
 			SJO dirs = tmp1.get("dirs");
@@ -218,14 +225,14 @@ public class WFSBrowser extends TreeView {
 					ret.add(item);
 				}
 			}
-			
-			if (ret.size()==0) {
+
+			if (ret.size() == 0) {
 				if (!m_checked_and_does_not_have_children) {
-					m_checked_and_does_not_have_children=true;
+					m_checked_and_does_not_have_children = true;
 					this.setValue(this.getValue()); //trigger an update of the item
 				}
 			}
-			
+
 			return ret;
 		}
 	}

@@ -37,14 +37,14 @@ public class CallbackHandler {
 		m_string_callbacks.get(name).add(callback);
 	}
 
-	public void trigger(String name,Boolean direct_connection) {
+	public void trigger(String name, Boolean direct_connection) {
 		if (!direct_connection) {
-			Platform.runLater(()->{
-				trigger(name,true);
+			Platform.runLater(() -> {
+				trigger(name, true);
 			});
 			return;
 		}
-		
+
 		if (m_callbacks.containsKey(name)) {
 			m_callbacks.get(name).forEach(callback -> {
 				callback.run();
@@ -54,8 +54,8 @@ public class CallbackHandler {
 
 	public void trigger(String name, String param, Boolean direct_connection) {
 		if (!direct_connection) {
-			Platform.runLater(()->{
-				trigger(name,param,true);
+			Platform.runLater(() -> {
+				trigger(name, param, true);
 			});
 			return;
 		}
@@ -74,11 +74,12 @@ public class CallbackHandler {
 		m_scheduled_triggers.add(name);
 		new Timeline(new KeyFrame(Duration.millis(timeout), e -> {
 			m_scheduled_triggers.remove(name);
-			trigger(name,true);
+			trigger(name, true);
 		})).play();
 
 	}
-	public static void scheduleCallback(Runnable callback,int timeout) {
+
+	public static void scheduleCallback(Runnable callback, int timeout) {
 		new Timeline(new KeyFrame(Duration.millis(timeout), e -> {
 			callback.run();
 		})).play();

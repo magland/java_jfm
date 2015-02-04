@@ -99,9 +99,11 @@ public class SJO {
 		}
 		return m_map.keySet();
 	}
-	
+
 	public int getLength() {
-		if (m_array==null) return 0;
+		if (m_array == null) {
+			return 0;
+		}
 		return m_array.size();
 	}
 

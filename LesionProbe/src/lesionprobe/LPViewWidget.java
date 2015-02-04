@@ -26,7 +26,7 @@ public class LPViewWidget extends GridPane {
 	WFSClient m_client = null;
 	String m_id;
 	int[][] m_arrow_coordinates = new int[0][0];
-	int m_current_slice=-1;
+	int m_current_slice = -1;
 
 	LPViewWidget() {
 
@@ -46,7 +46,7 @@ public class LPViewWidget extends GridPane {
 			view0.setBottomControlsVisible(false);
 			view0.setCursorVisible(false);
 			view0.onCurrentSliceChanged(() -> {
-				Platform.runLater(()->{
+				Platform.runLater(() -> {
 					int[] ind0 = view0.currentIndex();
 					for (ViewmdaWidget view2 : m_views) {
 						view2.setCurrentIndex(ind0);
@@ -54,7 +54,7 @@ public class LPViewWidget extends GridPane {
 				});
 			});
 			view0.onSelectedRectChanged(() -> {
-				Platform.runLater(()->{
+				Platform.runLater(() -> {
 					int[] rect0 = view0.selectedRect();
 					for (ViewmdaWidget view2 : m_views) {
 						view2.setSelectedRect(rect0);
@@ -86,8 +86,9 @@ public class LPViewWidget extends GridPane {
 	public void refreshViews(Runnable callback) {
 		refresh_views(callback);
 	}
-	public void preloadCase(String id,int[][] coords,Runnable callback) {
-		preload_case(id,coords,callback);
+
+	public void preloadCase(String id, int[][] coords, Runnable callback) {
+		preload_case(id, coords, callback);
 	}
 
 	public void setShowArrows(boolean val) {
@@ -108,12 +109,12 @@ public class LPViewWidget extends GridPane {
 		if (slice < 0) {
 			slice = 0;
 		}
-		final int slice0=slice;
-		m_views.get(0).array().initialize(tmp1->{
+		final int slice0 = slice;
+		m_views.get(0).array().initialize(tmp1 -> {
 			//if (slice0 >= m_views.get(0).array().N1()) {
 			//	slice0 = m_views.get(0).array().N1() - 1;
 			//}
-			m_current_slice=slice0;
+			m_current_slice = slice0;
 			int[] ind = m_views.get(0).currentIndex();
 			ind[2] = slice0;
 			m_views.get(0).setCurrentIndex(ind);
@@ -121,8 +122,8 @@ public class LPViewWidget extends GridPane {
 	}
 
 	public void zoomIn() {
-		int[] RR=m_views.get(0).selectedRect();
-		if (RR[0]<0) {
+		int[] RR = m_views.get(0).selectedRect();
+		if (RR[0] < 0) {
 			JUtils.showInformation("Zoom In", "To zoom in, you must select a rectangle within the image.");
 			return;
 		}
@@ -138,7 +139,6 @@ public class LPViewWidget extends GridPane {
 	}
 
 	/////////// PRIVATE /////////////////////////////////
-	
 	private List<String> get_image_paths(String id) {
 		List<String> image_paths = new ArrayList<>();
 		image_paths.add("Images/" + id + "_FLAIR.nii");
@@ -147,38 +147,39 @@ public class LPViewWidget extends GridPane {
 		image_paths.add("Images/" + id + "_T2.nii");
 		return image_paths;
 	}
-	
-	private void preload_case(String id,int[][] coords,Runnable callback) {
+
+	private void preload_case(String id, int[][] coords, Runnable callback) {
 		if (m_client == null) {
 			callback.run();
 			return;
 		}
-		
-		if (coords.length==0) {
+
+		if (coords.length == 0) {
 			callback.run();
 			return;
 		}
 
-		List<String> image_paths=get_image_paths(id);
-		
-		final int num=image_paths.size();
-		m_num_loaded=0;
-		for (int i=0; i<num; i++) {
+		List<String> image_paths = get_image_paths(id);
+
+		final int num = image_paths.size();
+		m_num_loaded = 0;
+		for (int i = 0; i < num; i++) {
 			final ViewmdaWidget view0 = m_views.get(i);
-			final int ind=i;
+			final int ind = i;
 			RemoteArray X = load_array(image_paths.get(ind));
-			int[] inds=new int[Mda.MAX_MDA_DIMS];
-			inds[0]=coords[0][2];
-			X.getDataXY(inds, (tmp1)->{
+			int[] inds = new int[Mda.MAX_MDA_DIMS];
+			inds[0] = coords[0][2];
+			X.getDataXY(inds, (tmp1) -> {
 				m_num_loaded++;
-				if (m_num_loaded>=num) {
+				if (m_num_loaded >= num) {
 					callback.run();
 				}
 			});
 		}
 	}
-	
-	int m_num_loaded=0;
+
+	int m_num_loaded = 0;
+
 	private void refresh_views(Runnable callback) {
 
 		if (m_client == null) {
@@ -186,18 +187,18 @@ public class LPViewWidget extends GridPane {
 			return;
 		}
 
-		List<String> image_paths=get_image_paths(m_id);
-		
-		final int num=min(m_views.size(),image_paths.size());
-		m_num_loaded=0;
-		for (int i=0; i<num; i++) {
+		List<String> image_paths = get_image_paths(m_id);
+
+		final int num = min(m_views.size(), image_paths.size());
+		m_num_loaded = 0;
+		for (int i = 0; i < num; i++) {
 			final ViewmdaWidget view0 = m_views.get(i);
-			final int ind=i;
+			final int ind = i;
 			view0.clearView();
 			RemoteArray X = load_array(image_paths.get(ind));
 			view0.setRemoteArray(X, () -> {
 				m_num_loaded++;
-				if (m_num_loaded>=num) {
+				if (m_num_loaded >= num) {
 					callback.run();
 				}
 			});

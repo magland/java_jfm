@@ -1,12 +1,10 @@
 package lesionprobe;
 
 import static java.lang.Integer.parseInt;
-import static java.lang.System.exit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -104,7 +102,7 @@ public class LPMainWidget extends HBox {
 			m_control_panel.setStatus("Loading coordinates...");
 			m_client.readTextFile("coordinates.csv", tmp1 -> {
 				String txt = tmp1.get("text").toString();
-				txt=txt.replace("\r", "\n");
+				txt = txt.replace("\r", "\n");
 				String[] lines = txt.split("\n");
 				if (lines.length < 2) {
 					return;
@@ -113,7 +111,7 @@ public class LPMainWidget extends HBox {
 				m_client.readTextFile("name_order.csv", tmp2 -> {
 					m_control_panel.setStatus(".");
 					String txt2 = tmp2.get("text").toString();
-					txt2=txt2.replace("\r", "\n");
+					txt2 = txt2.replace("\r", "\n");
 					String[] lines2 = txt2.split("\n");
 					if (lines2.length < 1) {
 						return;
@@ -319,7 +317,7 @@ public class LPMainWidget extends HBox {
 		for (int i = 0; i < answers.length; i++) {
 			m_answers.setAnswer(m_control_panel.getCurrentId() + String.format(" arrow-%d", i), answers[i]);
 		}
-		m_answers.save(false,() -> {
+		m_answers.save(false, () -> {
 			goto_next_case();
 			show_case();
 		});
@@ -342,28 +340,28 @@ public class LPMainWidget extends HBox {
 				.masthead(null)
 				.message("Are you sure you want to reset the answers for this rater? (This will erase all answers)")
 				.showConfirm();
-		
+
 		if (response == Dialog.ACTION_YES) {
 			m_answers.resetAnswers();
-			m_answers.save(true, ()->{
-				JUtils.showInformation("Answers reset","Answers have been reset.");
+			m_answers.save(true, () -> {
+				JUtils.showInformation("Answers reset", "Answers have been reset.");
 				m_control_panel.refresh();
 			});
 		}
 	}
 
 	private void on_view_answers() {
-		m_answers.loadCsv(txt->{
-			show_text("Answers for "+m_rater,txt);
+		m_answers.loadCsv(txt -> {
+			show_text("Answers for " + m_rater, txt);
 		});
 	}
-	
-	private void show_text(String title,String txt) {
+
+	private void show_text(String title, String txt) {
 		Dialog dlg = new Dialog(null, title);
 
-		final VBox vbox=new VBox();
-		
-		TextArea TA=new TextArea();
+		final VBox vbox = new VBox();
+
+		TextArea TA = new TextArea();
 		TA.setEditable(false);
 		TA.setText(txt);
 		vbox.getChildren().add(TA);

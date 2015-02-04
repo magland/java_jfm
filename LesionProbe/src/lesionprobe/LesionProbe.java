@@ -1,9 +1,6 @@
 package lesionprobe;
 
 import java.io.File;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -34,7 +31,6 @@ import org.magland.wfs.WFSClient;
  Web browser interface to some features including downloading of answer spreadsheet
  Notification of new version available
  */
-
 /**
  *
  * @author magland
@@ -42,8 +38,8 @@ import org.magland.wfs.WFSClient;
 public class LesionProbe extends Application {
 
 	LPMainWidget m_widget;
-	
-	static final String LesionProbe_version="1.02";
+
+	static final String LesionProbe_version = "1.02";
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -74,8 +70,8 @@ public class LesionProbe extends Application {
 			primaryStage.setScene(scene);
 
 			WFSClient CC = new WFSClient(params.get("fshost").toString(), params.get("fsname").toString(), params.get("folder").toString());
-			String cache_dir=create_temp_directory("LesionProbe-cache");
-			System.out.println("Using cach path: "+cache_dir);
+			String cache_dir = create_temp_directory("LesionProbe-cache");
+			System.out.println("Using cach path: " + cache_dir);
 			CC.setCachePath(cache_dir);
 			m_widget.setClient(CC);
 			m_widget.setRater(params.get("rater").toString());
@@ -87,19 +83,17 @@ public class LesionProbe extends Application {
 		});
 
 	}
-	
+
 	private String create_temp_directory(String name) {
 		try {
-			String ret=System.getProperty("java.io.tmpdir")+"/"+name;
+			String ret = System.getProperty("java.io.tmpdir") + "/" + name;
 			try {
 				(new File(ret)).mkdir();
-			}
-			catch (Exception ee) {
-				
+			} catch (Exception ee) {
+
 			}
 			return ret;
-		}
-		catch (Exception ee) {
+		} catch (Exception ee) {
 			return "";
 		}
 	}
@@ -126,13 +120,13 @@ public class LesionProbe extends Application {
 
 	private void show_config_dlg(SJOCallback callback) {
 
-		Dialog dlg = new Dialog(null, "LesionProbe Configuration - Version "+LesionProbe_version);
+		Dialog dlg = new Dialog(null, "LesionProbe Configuration - Version " + LesionProbe_version);
 
 		final GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
 
-		int row=0;
+		int row = 0;
 		grid.add(new Label("FSHost"), 0, row);
 		TextField fshost_field = new TextField();
 		//fshost_field.setText("localhost:8006");
@@ -184,13 +178,14 @@ public class LesionProbe extends Application {
 			dlg.hide();
 
 			if (ret.get("admin_mode").toBoolean()) {
-				Platform.runLater(()->{
-					check_admin_password(()->{
+				Platform.runLater(() -> {
+					check_admin_password(() -> {
 						callback.run(ret);
 					});
 				});
+			} else {
+				callback.run(ret);
 			}
-			else callback.run(ret);
 		});
 
 		Button cancel_button = new Button("Cancel");
@@ -247,8 +242,8 @@ public class LesionProbe extends Application {
 			if (password_field.getText().equals(the_password)) {
 				callback.run();
 			} else {
-				Platform.runLater(()->{
-					JUtils.showInformation("Incorrect password","Incorrect admin password.");
+				Platform.runLater(() -> {
+					JUtils.showInformation("Incorrect password", "Incorrect admin password.");
 					System.exit(0);
 				});
 			}
@@ -262,10 +257,10 @@ public class LesionProbe extends Application {
 
 		bar.getButtons().addAll(ok_button, cancel_button);
 		grid.add(bar, 1, 2);
-		
-		password_field.setOnKeyPressed(evt->{
+
+		password_field.setOnKeyPressed(evt -> {
 			if (evt.getCode().equals(KeyCode.ENTER)) {
-				Platform.runLater(()->{
+				Platform.runLater(() -> {
 					ok_button.fire();
 				});
 			}

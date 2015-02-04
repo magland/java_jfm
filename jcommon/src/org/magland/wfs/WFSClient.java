@@ -2,7 +2,6 @@ package org.magland.wfs;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -12,11 +11,8 @@ import static java.lang.Math.random;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Map;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.magland.jcommon.SJO;
@@ -101,19 +97,21 @@ public class WFSClient {
 	}
 
 	private String get_read_dir_url(String path) {
-		String url = "http://" + m_fshost + "/wisdmfileserver/getFolderData?fsname=" +m_fsname+"&path=" + path + "&recursive=false";
+		String url = "http://" + m_fshost + "/wisdmfileserver/getFolderData?fsname=" + m_fsname + "&path=" + path + "&recursive=false";
 		url = url + "&rand=" + String.format("%.10f", random());
 		return url;
 	}
+
 	public void readDir(String path, SJOCallback callback) {
-		String url=get_read_dir_url(path);
+		String url = get_read_dir_url(path);
 		do_get_text(url, str -> {
 			callback.run(new SJO(str.get("text").toString()));
 		});
 	}
+
 	public SJO readDirSync(String path) {
-		String url=get_read_dir_url(path);
-		String json=do_get_text_sync(url).get("text").toString();
+		String url = get_read_dir_url(path);
+		String json = do_get_text_sync(url).get("text").toString();
 		return new SJO(json);
 	}
 
@@ -159,19 +157,18 @@ public class WFSClient {
 		return path1 + "/" + path2;
 	}
 
-	
 	public void do_get_text(String url0, SJOCallback callback) {
-		SJO ret=do_get_text_sync(url0);
+		SJO ret = do_get_text_sync(url0);
 		callback.run(ret);
 	}
+
 	public SJO do_get_text_sync(String url0) {
-		byte[] tmp=do_get_binary_sync(url0);
-		String txt="";
+		byte[] tmp = do_get_binary_sync(url0);
+		String txt = "";
 		try {
-			txt=new String(tmp,"UTF-8");
-		}
-		catch(Exception e) {
-			
+			txt = new String(tmp, "UTF-8");
+		} catch (Exception e) {
+
 		}
 		SJO ret = SJO.createMap();
 		ret.put("text", txt);
@@ -180,9 +177,9 @@ public class WFSClient {
 
 	public void do_get_binary(String url0, SJOCallback callback) {
 		//do_get_binary2(url0, callback);
-		GetBinaryRunner RR=new GetBinaryRunner();
-		RR.url=url0;
-		RR.callback=callback;
+		GetBinaryRunner RR = new GetBinaryRunner();
+		RR.url = url0;
+		RR.callback = callback;
 		RR.run();
 	}
 
@@ -201,7 +198,7 @@ public class WFSClient {
 							public void run() {
 								int len = tmp1.get("data").toByteArray().length;
 								if (len <= 1) {
-									System.err.println("length is <=1: "+url);
+									System.err.println("length is <=1: " + url);
 								}
 								callback.run(tmp1);
 							}
@@ -289,9 +286,9 @@ public class WFSClient {
 		}
 		return data;
 	}
-	
+
 	public void do_get_binary2(String url_in, SJOCallback callback) {
-		byte[] data=do_get_binary_sync(url_in);
+		byte[] data = do_get_binary_sync(url_in);
 		SJO ret = SJO.createMap();
 		ret.put("data", new SJO(data));
 		callback.run(ret);

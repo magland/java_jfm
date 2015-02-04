@@ -29,8 +29,8 @@ public class LPAnswers {
 	}
 
 	void load(Runnable callback) {
-		loadCsv(txt->{
-			txt=txt.replace("\r", "\n");
+		loadCsv(txt -> {
+			txt = txt.replace("\r", "\n");
 			String[] lines = txt.split("\n");
 			for (String line : lines) {
 				String[] vals = line.split(",");
@@ -41,13 +41,13 @@ public class LPAnswers {
 			callback.run();
 		});
 	}
-	
+
 	void loadCsv(StringCallback callback) {
 		if (m_client == null) {
 			return;
 		}
-		
-		final String path0="answers/" + m_rater + ".csv";
+
+		final String path0 = "answers/" + m_rater + ".csv";
 
 		m_answers.clear();
 		m_client.readTextFile(path0, tmp1 -> {
@@ -56,15 +56,15 @@ public class LPAnswers {
 		});
 	}
 
-	void save(Boolean do_backup,Runnable callback) {
+	void save(Boolean do_backup, Runnable callback) {
 		if (m_client == null) {
 			return;
 		}
-		final String path0="answers/" + m_rater + ".csv";
+		final String path0 = "answers/" + m_rater + ".csv";
 		if (do_backup) {
-			m_client.readTextFile(path0, tmp0->{
-				m_client.writeTextFile(String.format("%s/tmp.%d.%s", JUtils.getFilePath(path0),rand_int(10001,99999),JUtils.getFileName(path0)),tmp0.get("text").toString(),tmp00->{
-					save(false,callback);
+			m_client.readTextFile(path0, tmp0 -> {
+				m_client.writeTextFile(String.format("%s/tmp.%d.%s", JUtils.getFilePath(path0), rand_int(10001, 99999), JUtils.getFileName(path0)), tmp0.get("text").toString(), tmp00 -> {
+					save(false, callback);
 				});
 			});
 			return;
@@ -83,7 +83,7 @@ public class LPAnswers {
 			callback.run();
 		});
 	}
-	
+
 	public void resetAnswers() {
 		m_answers.clear();
 	}
@@ -99,7 +99,7 @@ public class LPAnswers {
 	void setAnswer(String id, String answer) {
 		m_answers.put(id, answer);
 	}
-	
+
 	private static int rand_int(int min, int max) {
 		Random rand = new Random();
 		int num = rand.nextInt((max - min) + 1) + min;
