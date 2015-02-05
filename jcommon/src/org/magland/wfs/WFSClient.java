@@ -71,7 +71,14 @@ public class WFSClient {
 	}
 
 	public void readFileBytes(String path, String bytes, SJOCallback callback) {
+		String debugstr="subarray;offset=352;dimensions=181,217,181,1;index=90,*,*,0;size=4";
+		if (bytes.equals(debugstr)) {
+			System.out.println("test A");
+		}
 		get_file_checksum(path, obj1 -> {
+			if (bytes.equals(debugstr)) {
+				System.out.println("test B");
+			}
 			String checksum = obj1.get("checksum").toString();
 
 			byte[] data0 = get_data_from_cache(checksum, bytes);
@@ -81,8 +88,16 @@ public class WFSClient {
 				callback.run(obj0);
 				return;
 			}
+			
+			if (bytes.equals(debugstr)) {
+				System.out.println("test C");
+			}
 
 			get_file_bytes(checksum, bytes, obj2 -> {
+				
+				if (bytes.equals(debugstr)) {
+					System.out.println("test D");
+				}
 
 				set_data_to_cache(checksum, bytes, obj2.get("data").toByteArray());
 

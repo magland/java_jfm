@@ -1,5 +1,6 @@
 package org.magland.jcommon;
 
+import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import javafx.scene.Node;
@@ -98,5 +99,19 @@ public class JUtils {
 		stage.show();
 
 		return stage;
+	}
+
+	static public String createTemporaryDirectory(String name) {
+		try {
+			String ret = System.getProperty("java.io.tmpdir") + "/" + name;
+			try {
+				(new File(ret)).mkdir();
+			} catch (Exception ee) {
+
+			}
+			return ret;
+		} catch (Exception ee) {
+			return "";
+		}
 	}
 }

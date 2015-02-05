@@ -175,8 +175,12 @@ public class LPMainWidget extends HBox {
 						preload_cases(() -> {
 							m_control_panel.setStatus(".");
 							m_case_index = -1;
-							goto_next_case();
-							show_case();
+							if (goto_next_case())
+								show_case();
+							else {
+								if (!m_admin_mode)
+									show_final_message();
+							}
 						});
 					}, 1000);
 
@@ -201,42 +205,45 @@ public class LPMainWidget extends HBox {
 		});
 	}
 
-	private void goto_next_case() {
+	private Boolean goto_next_case() {
+		if (m_case_index+1>=m_cases.size()) return false;
 		m_case_index++;
 		if (m_admin_mode) {
 			if (m_case_index >= m_cases.size()) {
 				m_case_index = m_cases.size() - 1;
 			}
-			return;
+			return true;
 		}
 		while (m_case_index < m_cases.size()) {
 			Case cc = m_cases.get(m_case_index);
 			String id0 = cc.id + " arrow-0";
 			if (m_answers.getAnswer(id0).isEmpty()) {
-				return;
+				return true;
 			} else {
 				m_case_index++;
 			}
 		}
+		m_case_index=m_cases.size()-1;
+		return false;
 	}
 
-	private void goto_previous_case() {
+	private Boolean goto_previous_case() {
+		if (m_case_index-1<0) return false;
 		m_case_index--;
 		if (m_admin_mode) {
-			if (m_case_index < 0) {
-				m_case_index = 0;
-			}
-			return;
+			return true;
 		}
-		while (m_case_index >= m_cases.size()) {
+		while (m_case_index >= 0) {
 			Case cc = m_cases.get(m_case_index);
 			String id0 = cc.id + " arrow-0";
 			if (m_answers.getAnswer(id0).isEmpty()) {
-				return;
+				return true;
 			} else {
 				m_case_index--;
 			}
 		}
+		m_case_index=0;
+		return false;
 	}
 
 	private void show_final_message() {
@@ -318,19 +325,24 @@ public class LPMainWidget extends HBox {
 			m_answers.setAnswer(m_control_panel.getCurrentId() + String.format(" arrow-%d", i), answers[i]);
 		}
 		m_answers.save(false, () -> {
-			goto_next_case();
-			show_case();
+			if (goto_next_case())
+				show_case();
+			else {
+				show_final_message();
+			}
 		});
 	}
 
 	private void on_previous_case() {
-		goto_previous_case();
-		show_case();
+		if (goto_previous_case()) {
+			show_case();
+		}
 	}
 
 	private void on_next_case() {
-		goto_next_case();
-		show_case();
+		if (goto_next_case()) {
+			show_case();
+		}
 	}
 
 	private void on_reset_answers() {

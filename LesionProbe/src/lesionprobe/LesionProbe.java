@@ -39,7 +39,7 @@ public class LesionProbe extends Application {
 
 	LPMainWidget m_widget;
 
-	static final String LesionProbe_version = "1.02";
+	static final String LesionProbe_version = "1.03";
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -70,7 +70,7 @@ public class LesionProbe extends Application {
 			primaryStage.setScene(scene);
 
 			WFSClient CC = new WFSClient(params.get("fshost").toString(), params.get("fsname").toString(), params.get("folder").toString());
-			String cache_dir = create_temp_directory("LesionProbe-cache");
+			String cache_dir = JUtils.createTemporaryDirectory("LesionProbe-cache");
 			System.out.println("Using cach path: " + cache_dir);
 			CC.setCachePath(cache_dir);
 			m_widget.setClient(CC);
@@ -82,20 +82,6 @@ public class LesionProbe extends Application {
 			m_widget.run();
 		});
 
-	}
-
-	private String create_temp_directory(String name) {
-		try {
-			String ret = System.getProperty("java.io.tmpdir") + "/" + name;
-			try {
-				(new File(ret)).mkdir();
-			} catch (Exception ee) {
-
-			}
-			return ret;
-		} catch (Exception ee) {
-			return "";
-		}
 	}
 
 	/**
@@ -131,7 +117,8 @@ public class LesionProbe extends Application {
 		TextField fshost_field = new TextField();
 		//fshost_field.setText("localhost:8006");
 		if (JUtils.connectedToInternet()) {
-			fshost_field.setText("97.107.129.125:8080"); //peregrine01
+			fshost_field.setText("45.56.110.165:8080"); //pennsive01
+			//fshost_field.setText("97.107.129.125:8080"); //peregrine01
 			//fshost_field.setText("localhost:8006");
 		} else {
 			System.err.println("Not connected to the internet.");
