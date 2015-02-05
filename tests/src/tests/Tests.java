@@ -37,9 +37,9 @@ public class Tests extends Application {
 
 		//WFSClient CC = new WFSClient("localhost:8006", "LesionProbe", "");
 		WFSClient CC = new WFSClient(fshost, "LesionProbe", "");
-		//String cache_dir = JUtils.createTemporaryDirectory("tests-cache");
-		//System.out.println("Using cach path: " + cache_dir);
-		//CC.setCachePath(cache_dir);
+		String cache_dir = JUtils.createTemporaryDirectory("tests-cache");
+		System.out.println("Using cach path: " + cache_dir);
+		CC.setCachePath(cache_dir);
 
 		if (false) {
 			test_double_wfs_browser(primaryStage, CC);
