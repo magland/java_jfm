@@ -73,8 +73,8 @@ public class LPViewWidget extends GridPane {
 
 	public void setDataId(String id) {
 		m_id = id;
-		for (ViewmdaWidget view:m_views) {
-			int[] tmp={-1,-1,0,0};
+		for (ViewmdaWidget view : m_views) {
+			int[] tmp = {-1, -1, 0, 0};
 			view.setSelectedRect(tmp);
 			view.setZoomRect(tmp);
 		}

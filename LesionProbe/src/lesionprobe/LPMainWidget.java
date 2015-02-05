@@ -175,11 +175,12 @@ public class LPMainWidget extends HBox {
 						preload_cases(() -> {
 							m_control_panel.setStatus(".");
 							m_case_index = -1;
-							if (goto_next_case())
+							if (goto_next_case()) {
 								show_case();
-							else {
-								if (!m_admin_mode)
+							} else {
+								if (!m_admin_mode) {
 									show_final_message();
+								}
 							}
 						});
 					}, 1000);
@@ -206,7 +207,9 @@ public class LPMainWidget extends HBox {
 	}
 
 	private Boolean goto_next_case() {
-		if (m_case_index+1>=m_cases.size()) return false;
+		if (m_case_index + 1 >= m_cases.size()) {
+			return false;
+		}
 		m_case_index++;
 		if (m_admin_mode) {
 			if (m_case_index >= m_cases.size()) {
@@ -223,12 +226,14 @@ public class LPMainWidget extends HBox {
 				m_case_index++;
 			}
 		}
-		m_case_index=m_cases.size()-1;
+		m_case_index = m_cases.size() - 1;
 		return false;
 	}
 
 	private Boolean goto_previous_case() {
-		if (m_case_index-1<0) return false;
+		if (m_case_index - 1 < 0) {
+			return false;
+		}
 		m_case_index--;
 		if (m_admin_mode) {
 			return true;
@@ -242,7 +247,7 @@ public class LPMainWidget extends HBox {
 				m_case_index--;
 			}
 		}
-		m_case_index=0;
+		m_case_index = 0;
 		return false;
 	}
 
@@ -325,9 +330,9 @@ public class LPMainWidget extends HBox {
 			m_answers.setAnswer(m_control_panel.getCurrentId() + String.format(" arrow-%d", i), answers[i]);
 		}
 		m_answers.save(false, () -> {
-			if (goto_next_case())
+			if (goto_next_case()) {
 				show_case();
-			else {
+			} else {
 				show_final_message();
 			}
 		});
