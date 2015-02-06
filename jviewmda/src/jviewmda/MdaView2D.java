@@ -68,6 +68,8 @@ public class MdaView2D extends StackPane {
 		}
 		m_current_index[0] = ind[0];
 		m_current_index[1] = ind[1];
+		int[] tmp={-1,-1,0,0};
+		m_selected_rect=tmp;
 		refresh_cursor();
 		CH.scheduleTrigger("current-index-changed", 100);
 	}

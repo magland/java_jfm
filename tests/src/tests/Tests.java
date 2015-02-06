@@ -5,6 +5,12 @@
  */
 package tests;
 
+/*
+TO DO:
+Allow selecting of 3D area ???
+Switch cache cleanup back to 1 day ago
+*/
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;

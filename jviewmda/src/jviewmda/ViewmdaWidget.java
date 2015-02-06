@@ -10,9 +10,13 @@ import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -52,6 +56,12 @@ public class ViewmdaWidget extends VBox {
 	public ViewmdaWidget() {
 
 		this.getStyleClass().add("viewmdawidget");
+		
+		try {
+			this.getStylesheets().add(getClass().getResource("resources/viewmdawidget.css").toExternalForm());
+		} catch (Exception ee) {
+			System.err.println("Unable to load viewmda3dplanewidget.css");
+		}
 
 		CustomTooltipBehavior.setup(50, 10000, 200);
 
@@ -66,9 +76,17 @@ public class ViewmdaWidget extends VBox {
 		for (int i = 0; i < m_invert_dims.length; i++) {
 			m_invert_dims[i] = false;
 		}
+		m_invert_dims[2]=true; //by default, invert the Z dimension
+		
+		MenuButton menu_button=new MenuButton("...");
+		{
+			MenuItem item = new MenuItem("Open three plane view");
+			item.setOnAction(e -> on_open_three_plane_view());
+			menu_button.getItems().add(item);
+		}
 
 		HBox top_controls = new HBox();
-		top_controls.getChildren().addAll(m_dim1_box, m_dim2_box, m_dim3_box);
+		top_controls.getChildren().addAll(m_dim1_box, m_dim2_box, m_dim3_box,menu_button);
 		m_top_controls = top_controls;
 
 		HBox view_section = new HBox();
@@ -428,6 +446,10 @@ public class ViewmdaWidget extends VBox {
 	private void do_refresh_view() {
 		m_global_refresh_code++;
 		int local_refresh_code = m_global_refresh_code;
+		int d1=m_dim_choices[0];
+		int d2=m_dim_choices[1];
+		m_view.setInvertX(m_invert_dims[d1]);
+		m_view.setInvertY(m_invert_dims[d2]);
 		extract_2d_array(tmp1 -> {
 			if (m_global_refresh_code != local_refresh_code) {
 				return;
@@ -593,7 +615,6 @@ public class ViewmdaWidget extends VBox {
 		compute_selected_rect_stats();
 		update_status();
 		int[] rr = m_view.selectedRect();
-		System.out.format("on_selected_rect_changed %d,%d,%d,%d\n", rr[0], rr[1], rr[2], rr[3]);
 		CH.trigger("selected-rect-changed", true);
 	}
 
@@ -720,5 +741,12 @@ public class ViewmdaWidget extends VBox {
 		// java 8 =>
 		text.applyCss();
 		return text.getLayoutBounds().getWidth();
+	}
+	
+	private void on_open_three_plane_view() {
+		Viewmda3PlaneWidget W=new Viewmda3PlaneWidget();
+		W.setRemoteArray(m_remote_array, ()->{
+			
+		});
 	}
 }

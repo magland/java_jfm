@@ -11,10 +11,14 @@ import static java.lang.Math.random;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
+import java.util.Calendar;
+import java.util.Date;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import org.magland.jcommon.JUtils;
 import org.magland.jcommon.SJO;
 import org.magland.jcommon.SJOCallback;
 
@@ -48,7 +52,9 @@ public class WFSClient {
 		if (!m_cache_path.isEmpty()) {
 			String cache_file_path = get_cache_file_path(checksum, bytes);
 			if (!cache_file_path.isEmpty()) {
-				if ((new File(cache_file_path)).exists()) {
+				File file=new File(cache_file_path);
+				if (file.exists()) {
+					file.setLastModified(System.currentTimeMillis()); //touch the file so it won't get deleted until tomorrow (or whenever)
 					byte[] data = read_binary_file(cache_file_path);
 					return data;
 				}
@@ -132,9 +138,37 @@ public class WFSClient {
 
 	public void setCachePath(String path) {
 		m_cache_path = path;
+		clean_up_cache();
 	}
 
 	////////////// PRIVATE ///////////////////////
+	private void clean_up_cache() {
+		File folder = new File(m_cache_path);
+		File[] list = folder.listFiles();
+		for (int i = 0; i < list.length; i++) {
+			String file_path = list[i].getAbsolutePath();
+			String name = JUtils.getFileName(file_path);
+			if (name.length() == 40 + 32 + 2 + 4) { //to be safe we make sure that the file name is of the expected length
+				if (name.substring(40, 42).equals("--")) { //and we also check one more thing for safety
+					Date date = new Date(list[i].lastModified());
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.DATE, -1);
+					//cal.add(Calendar.MINUTE, -5);
+					if (date.before(cal.getTime())) {
+						System.out.println("Deleting file from cache: " + name);
+						try {
+							Files.delete(list[i].toPath());
+						} catch (Exception err) {
+							System.err.println("Problem deleting file in cache.");
+							return;
+						}
+					}
+				}
+
+			}
+		}
+	}
+
 	private void get_file_checksum(String path, SJOCallback callback) {
 		String url = "http://" + m_fshost + "/wisdmfileserver/getFileChecksum?fsname=" + m_fsname + "&path=" + append_paths(m_folder, path);
 		url = url + "&rand=" + String.format("%.10f", random());

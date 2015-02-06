@@ -110,7 +110,6 @@ public class Viewmda3PlaneWidget extends VBox {
 	private void on_selected_rect_changed(ViewmdaWidget W_in) {
 		m_setting_selected_rects = true;
 		int[] rr = W_in.selectedRect();
-		System.out.format("::: %d,%d,%d,%d\n", rr[0], rr[1], rr[2], rr[3]);
 		if (rr[0] >= 0) { //this is necessary since we don't want to clear the selected rect on others just because the selected rect on this one was cleared -- problem with delayed signals
 			for (ViewmdaWidget W : m_views) {
 				if (W != W_in) {
