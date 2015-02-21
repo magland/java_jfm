@@ -36,7 +36,7 @@ import org.magland.wfs.WFSClient;
 public class JViewMda extends Application {
 
 	private Stage m_stage;
-	private Mda m_array = new Mda();
+	private Mda m_array = null;
 	private Preferences m_prefs;
 	private FileChooser m_fc = new FileChooser();
 	private ViewmdaWidget m_widget = new ViewmdaWidget();
@@ -194,6 +194,7 @@ public class JViewMda extends Application {
 	}
 
 	private void open_file(String path0) {
+		m_array=new Mda();
 		String suf = JUtils.getFileSuffix(path0);
 		if (suf.equals("mda")) {
 			if (!m_array.read(path0)) {
@@ -217,6 +218,7 @@ public class JViewMda extends Application {
 	}
 
 	private void on_file_saveas() {
+		if (m_array==null) return;
 		m_fc.setInitialDirectory(new File(m_prefs.get("open_file_directory", System.getProperty("user.home"))));
 		m_fc.setTitle("Open File");
 		File file0 = m_fc.showSaveDialog(m_stage);

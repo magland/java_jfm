@@ -1,12 +1,16 @@
 package jviewmda;
 
 import static java.lang.Math.max;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.layout.*;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -22,9 +26,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.magland.jcommon.CallbackHandler;
+import org.magland.jcommon.JUtils;
 import org.magland.jcommon.ObjectCallback;
 import org.magland.jcommon.SJO;
 import org.magland.jcommon.SJOCallback;
+import javafx.stage.Stage;
 
 /**
  *
@@ -32,7 +38,7 @@ import org.magland.jcommon.SJOCallback;
  */
 public class ViewmdaWidget extends VBox {
 
-	private RemoteArray m_remote_array = new WFSMda();
+	private RemoteArray m_remote_array = new LocalArray();
 	private ComboBox<String> m_dim1_box;
 	private ComboBox<String> m_dim2_box;
 	private ComboBox<String> m_dim3_box;
@@ -52,6 +58,7 @@ public class ViewmdaWidget extends VBox {
 	private int m_refresh_delay = 10;
 	private Boolean m_refreshing_dims = false;
 	private boolean[] m_invert_dims = new boolean[Mda.MAX_MDA_DIMS];
+	private Map<String, CheckMenuItem> m_selection_mode_items=new HashMap<>();
 
 	public ViewmdaWidget() {
 
@@ -78,16 +85,44 @@ public class ViewmdaWidget extends VBox {
 		}
 		m_invert_dims[2]=true; //by default, invert the Z dimension
 		
-		MenuButton menu_button=new MenuButton("...");
-		{
-			MenuItem item = new MenuItem("Open three plane view");
-			item.setOnAction(e -> on_open_three_plane_view());
-			menu_button.getItems().add(item);
-		}
-
 		HBox top_controls = new HBox();
-		top_controls.getChildren().addAll(m_dim1_box, m_dim2_box, m_dim3_box,menu_button);
 		m_top_controls = top_controls;
+		top_controls.getChildren().addAll(m_dim1_box, m_dim2_box, m_dim3_box);
+		{
+			MenuButton menu_button=new MenuButton("View");
+			{
+				MenuItem item = new MenuItem("Open three plane view");
+				item.setOnAction(e -> on_open_three_plane_view());
+				menu_button.getItems().add(item);
+			}
+			{
+				MenuItem item = new MenuItem("Zoom In");
+				item.setAccelerator(new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN));
+				item.setOnAction(e -> on_zoom_in());
+				menu_button.getItems().add(item);
+			}
+			{
+				MenuItem item = new MenuItem("Zoom Out");
+				item.setAccelerator(new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN,KeyCombination.SHIFT_DOWN));
+				item.setOnAction(e -> on_zoom_out());
+				menu_button.getItems().add(item);
+			}
+			{
+				CheckMenuItem item = new CheckMenuItem("Rectangle selection mode");
+				item.setSelected(true);
+				item.setOnAction(e -> {on_set_selection_mode("rectangle");});
+				menu_button.getItems().add(item);
+				m_selection_mode_items.put("rectangle", item);
+			}
+			{
+				CheckMenuItem item = new CheckMenuItem("Ellipse selection mode");
+				item.setOnAction(e -> {on_set_selection_mode("ellipse");});
+				menu_button.getItems().add(item);
+				m_selection_mode_items.put("ellipse", item);
+			}
+			
+			top_controls.getChildren().addAll(menu_button);
+		}
 
 		HBox view_section = new HBox();
 		m_view = new MdaView2D();
@@ -746,7 +781,29 @@ public class ViewmdaWidget extends VBox {
 	private void on_open_three_plane_view() {
 		Viewmda3PlaneWidget W=new Viewmda3PlaneWidget();
 		W.setRemoteArray(m_remote_array, ()->{
-			
+			Stage stage=(Stage)this.getScene().getWindow();
+			Stage W2=JUtils.popupWidget(W, stage.getTitle());
+			W2.setWidth(500); W2.setHeight(300);
+			Platform.runLater(()->{
+				stage.hide();
+			});
 		});
+	}
+	
+	private void on_zoom_in() {
+		if (m_view.selectedRect()[0]<0) {
+			JUtils.showInformation("Zoom In", "You must select a rectangle prior to zooming in.");
+			return;
+		}
+		this.zoomIn();
+	}
+	private void on_zoom_out() {
+		this.zoomOut();
+	}
+	private void on_set_selection_mode(String mode) {
+		this.setSelectionMode(mode);
+		m_selection_mode_items.forEach((mode0,item)->{
+			item.setSelected(mode0.equals(mode));
+		});	
 	}
 }

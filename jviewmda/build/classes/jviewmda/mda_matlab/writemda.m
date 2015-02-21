@@ -1,0 +1,81 @@
+function writemda(X,fname)
+
+num_dims=2;
+
+if (size(X,3)>1) num_dims=3; end;
+if (size(X,4)>1) num_dims=4; end;
+if (size(X,5)>1) num_dims=5; end;
+if (size(X,6)>1) num_dims=6; end;
+
+FF=fopen(fname,'w');
+
+complex=1;
+if (isreal(X)) complex=0; end;
+
+if (complex)
+	fwrite(FF,-1,'int32');
+	fwrite(FF,8,'int32');
+	fwrite(FF,num_dims,'int32');
+	dimprod=1;
+	for dd=1:num_dims
+		fwrite(FF,size(X,dd),'int32');
+		dimprod=dimprod*size(X,dd);
+	end;
+	XS=reshape(X,dimprod,1);
+	Y=zeros(dimprod*2,1);
+	Y(1:2:dimprod*2-1)=real(XS);
+	Y(2:2:dimprod*2)=imag(XS);
+	fwrite(FF,Y,'float32');
+else
+	code=-3; %float
+	num_bytes=4;
+	if (all(X(:)==floor(X(:)))) %test for integer
+		minval=min(X(:));
+		maxval=max(X(:));
+		if (minval<0)
+			if (max(-minval,maxval)<=32767)
+				code=-4; %int16
+				num_bytes=2;
+			else
+				code=-5; %int32
+				num_bytes=4;
+			end;
+		else
+			if (maxval<=255)
+				code=-2; %byte
+				num_bytes=1;
+			elseif (maxval<=65535)
+				code=-6; %uint16
+				num_bytes=2;
+			else
+				code=-5; %int32
+				num_bytes=4;
+			end;					
+		end;
+	end;
+	fwrite(FF,code,'int32');
+	fwrite(FF,num_bytes,'int32');
+	fwrite(FF,num_dims,'int32');
+	dimprod=1;
+	for dd=1:num_dims
+		fwrite(FF,size(X,dd),'int32');
+		dimprod=dimprod*size(X,dd);
+	end;
+	Y=reshape(X,dimprod,1);
+	if (code==-3)
+		fwrite(FF,Y,'float32');
+	elseif (code==-2)
+		fwrite(FF,Y,'uchar');
+	elseif (code==-4)
+		fwrite(FF,Y,'int16');
+	elseif (code==-5)
+		fwrite(FF,Y,'int32');
+	elseif (code==-6)
+		fwrite(FF,Y,'uint16');
+	end;
+	
+end;
+
+fclose(FF);
+
+end

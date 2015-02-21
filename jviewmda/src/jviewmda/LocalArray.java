@@ -13,6 +13,9 @@ class LocalArray extends RemoteArray {
 	Mda m_array = new Mda();
 	Boolean m_initialized = false;
 
+	public LocalArray() {
+		
+	}
 	public LocalArray(Mda X) {
 		m_array = X;
 	}
