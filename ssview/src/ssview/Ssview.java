@@ -1,12 +1,28 @@
 
 package ssview;
 
+import java.io.FileReader;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import jviewmda.Mda;
+
+/*
+TO DO:
+* left/right arrows for navigation (when go off range, scroll)
+double click centers
+message saying loading
+Separation bar between windows
+Problem when zooming in too much (near boundary?)
+Fix problem with left/right shift on lower window
+Fix problem when scrolling past edge
+Set fixed shift
+*/
 
 /**
  *
@@ -17,26 +33,20 @@ public class Ssview extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		
-		SSTimeSeriesWidget WW=new SSTimeSeriesWidget();
+		ScriptEngine engine=new ScriptEngineManager().getEngineByName("nashorn");
+		Invocable invocable=(Invocable)engine;
 		
-		StackPane root = new StackPane();
-		root.getChildren().add(WW);
-		
-		Scene scene = new Scene(root, 600, 500);
-		
-		primaryStage.setTitle("SSView");
-		primaryStage.setScene(scene);
-		primaryStage.show();
-		
-		Mda X=new Mda();
-		X.allocate(8,20000);
-		for (int ch=0; ch<X.size(0); ch++) {
-			for (int t=0; t<X.size(1); t++) {
-				X.setValue((Math.sqrt(1+ch))*(Math.sin(t*1.0/2000*(ch+1)*2*Math.PI*(t*1.0/X.size(1)-0.5))),ch,t);
-			}
+		try {
+			Object SSVIEW=new SSViewController();
+			engine.put("SSVIEW", SSVIEW);
+			engine.eval(new FileReader("src/ssview/testing.js"));
+			invocable.invokeFunction("fun1","Babe Ruth");
 		}
-		WW.setData(X);
+		catch(Exception e) {
+			System.err.println(e.getMessage());
+		}
 	}
+	
 
 	/**
 	 * @param args the command line arguments

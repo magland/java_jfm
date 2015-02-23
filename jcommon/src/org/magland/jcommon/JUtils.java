@@ -66,6 +66,14 @@ public class JUtils {
 				.message(message)
 				.showWarning();
 	}
+	static public void showError(String title, String message) {
+		Dialogs.create()
+				.owner(null)
+				.title(title)
+				.masthead(null)
+				.message(message)
+				.showError();
+	}
 
 	static public Boolean connectedToInternet() {
 		try {
