@@ -98,7 +98,9 @@ public class JUtils {
 		VBox root = new VBox();
 		root.getChildren().addAll(W);
 
-		Scene scene = new Scene(root, 300, 300);
+		double W0=W.minWidth(300);
+		double H0=W.minHeight(300);
+		Scene scene = new Scene(root, W0, H0);
 
 		Stage stage = new Stage();
 

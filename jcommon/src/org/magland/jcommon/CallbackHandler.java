@@ -80,7 +80,7 @@ public class CallbackHandler {
 	}
 
 	public static void scheduleCallback(Runnable callback, int timeout) {
-		new Timeline(new KeyFrame(Duration.millis(timeout), e -> {
+		new Timeline(new KeyFrame(Duration.millis(Math.max(timeout,1)), e -> {
 			callback.run();
 		})).play();
 	}

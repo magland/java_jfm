@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.FileOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 /**
  *
@@ -364,10 +366,12 @@ public class Mda {
 			fis.close();
 			return true;
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			try {
 				fis.close();
-			} catch (IOException e2) {
+			} catch (Exception e2) 
+			{
+				e2.printStackTrace();
 			}
 			e.printStackTrace();
 			return false;
@@ -455,14 +459,19 @@ public class Mda {
 			this.allocate(hold_dims);
 			int N = this.totalSize();
 			if (data_type == MDA_TYPE_COMPLEX) {
+				//need to improve efficiency of this read
 				for (int ii = 0; ii < N; ii++) {
 					double re0 = read_float(dis);
 					double im0 = read_float(dis);
 					m_data_real[ii] = re0;
 				}
 			} else if (data_type == MDA_TYPE_REAL) {
+				byte[] bytes=new byte[N*4];
+				dis.read(bytes);
+				FloatBuffer FB=ByteBuffer.wrap(bytes).asFloatBuffer();
 				for (int ii = 0; ii < N; ii++) {
-					double re0 = read_float(dis);
+					float re0 = FB.get(ii);
+					re0=swap(re0);
 					m_data_real[ii] = re0;
 				}
 			} else if (data_type == MDA_TYPE_SHORT) {
@@ -481,8 +490,11 @@ public class Mda {
 					m_data_real[ii] = re0;
 				}
 			} else if (data_type == MDA_TYPE_BYTE) {
+				byte[] bytes=new byte[N];
+				dis.read(bytes);
+				ByteBuffer BB=ByteBuffer.wrap(bytes);
 				for (int ii = 0; ii < N; ii++) {
-					int re0 = dis.readUnsignedByte();
+					float re0 = BB.get(ii);
 					m_data_real[ii] = re0;
 				}
 			} else {

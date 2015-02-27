@@ -351,9 +351,9 @@ class SSTimeSeriesView extends StackPane {
 		this.setOnScroll(evt -> {
 			double delta_y = evt.getDeltaY();
 			if (delta_y > 0) {
-				schedule_zoom_in((int) m_current_x);
+				zoom_in((int) m_current_x);
 			} else if (delta_y < 0) {
-				schedule_zoom_out((int) m_current_x);
+				zoom_out((int) m_current_x);
 			}
 
 		});
@@ -416,10 +416,10 @@ class SSTimeSeriesView extends StackPane {
 			this.getScene().setCursor(Cursor.MOVE);
 		}
 		else if (evt.getCode() == KeyCode.EQUALS) {
-			schedule_zoom_in((int) m_current_x);
+			zoom_in((int) m_current_x);
 			//evt.consume();
 		} else if (evt.getCode() == KeyCode.MINUS) {
-			schedule_zoom_out((int) m_current_x);
+			zoom_out((int) m_current_x);
 			//evt.consume();
 		} else if (evt.getCode().equals(KeyCode.LEFT)) {
 			if (evt.isControlDown()) {
@@ -492,28 +492,10 @@ class SSTimeSeriesView extends StackPane {
 		setCurrentChannel(m_plot.pixToChannel(new Vec2(evt.getX(), evt.getY())));
 	}
 
-	boolean zoom_in_scheduled=false;
-	void schedule_zoom_in(int center_x) {
-		if (zoom_in_scheduled) return;
-		zoom_in_scheduled=true;
-		CallbackHandler.scheduleCallback(()->{
-			zoom_in(center_x);
-			zoom_in_scheduled=false;
-		},10);
-	}
 	void zoom_in(int center_x) {
 		do_zoom(center_x, 0.9);
 	}
 
-	boolean zoom_out_scheduled=false;
-	void schedule_zoom_out(int center_x) {
-		if (zoom_out_scheduled) return;
-		zoom_out_scheduled=true;
-		CallbackHandler.scheduleCallback(()->{
-			zoom_out(center_x);
-			zoom_out_scheduled=false;
-		},10);
-	}
 	void zoom_out(int center_x) {
 		do_zoom(center_x, 1 / 0.9);
 	}
@@ -886,7 +868,7 @@ class SSTimeSeriesPlot extends ExpandingCanvas {
 		m_plot_area.setSize(this.getWidth(), this.getHeight());
 
 		if (M == 0) {
-			start_refreshing_plot_area(gc);
+			m_plot_area.refresh(gc);
 			return;
 		}
 
@@ -911,14 +893,10 @@ class SSTimeSeriesPlot extends ExpandingCanvas {
 			m_plot_area.addSeries(new PlotSeries(xvals, yvals, color));
 		}
 		if (m_show_plots) {
-			start_refreshing_plot_area(gc);
+			m_plot_area.refresh(gc);
 		} else {
 			gc.clearRect(0, 0, getWidth(), getHeight());
 		}
-	}
-	
-	void start_refreshing_plot_area(GraphicsContext gc) {
-		m_plot_area.refresh(gc);
 	}
 
 	double compute_min(Mda X) {
@@ -998,69 +976,21 @@ class PlotArea {
 		return new Vec2(m_ymin, m_ymax);
 	}
 
-	int[] pix_res_values={500,1000,2000,4000};
-	int current_refresh_pix_res_index=0;
-	int current_refresh_code=1;
-	int pix_res_index=0;
 	public void refresh(GraphicsContext gc) {
 		gc.clearRect(0, 0, m_width, m_height);
-		current_refresh_code++;
-		int pr=pix_res_values[pix_res_index];
-		do_refresh(current_refresh_code,0,m_xmin-1,gc);
-	}
-	void do_refresh(int code,int pr_index,double xmin,GraphicsContext gc) {
-		long starttime0=System.nanoTime();
-		
-		if (code!=current_refresh_code) return;
-		if (pr_index>=pix_res_values.length) return;
-		int pr=pix_res_values[pr_index];
-		
-		int tot_num_points=(int)(m_xmax-m_xmin+1);
-		
-		int incr = 1;
-		if (tot_num_points > pr) {
-			incr = (int) Math.ceil(tot_num_points * 1.0 / pr);
-		}
-		double tmpx1=coordToPix(new Vec2(xmin,0)).x;
-		double tmpx2=coordToPix(new Vec2(xmin+tot_num_points,0)).x+1;
-		
-		int num_points_per_run=1000*1000;
-		double xmax=xmin+num_points_per_run*1.0/m_series.size()*incr;
-		//double xmax=xmin+(tmpx2-tmpx1)/tot_num_points*incr*num_points_per_run/m_series.size();
-		Vec2 PP0=coordToPix(new Vec2(xmin,m_ymin));
-		Vec2 PP1=coordToPix(new Vec2(xmax,m_ymax));
-		/*
-		String[] color_strings={
-		"#F7977A","#FDC68A",
-		"#C4DF9B","#82CA9D",
-		"#6ECFF6","#8493CA",
-		"#A187BE","#F49AC2",
-		"#F9AD81","#FFF79A",
-		"#A2D39C","#7BCDC8",
-		"#7EA7D8","#8882BE",
-		"#BC8DBF","#F6989D"
-		};
-		gc.setFill(Color.web(color_strings[((int)Math.abs(xmin)) % color_strings.length]));
-		gc.fillRect(Math.min(PP0.x,PP1.x),Math.min(PP0.y,PP1.y), Math.abs(PP0.x-PP1.x), Math.abs(PP0.y-PP1.y));
-		*/
-		gc.clearRect(Math.min(PP0.x,PP1.x),Math.min(PP0.y,PP1.y), Math.abs(PP0.x-PP1.x), Math.abs(PP0.y-PP1.y));
-				
-		for (int ss=0; ss<m_series.size(); ss++) {
-			PlotSeries SS=m_series.get(ss);
+		for (PlotSeries SS : m_series) {
 			int N = SS.xvals.totalSize();
-			boolean is_first=true;
 			gc.beginPath();
 			gc.setStroke(SS.color);
-			int i1=(int)(xmin-incr*10 - m_xmin); 
-			int i2=(int)(xmax+incr*10 - m_xmin); 
-			i1=(i1/incr-1)*incr; i1=(int)Math.min(Math.max(i1,0),N);
-			i2=(i2/incr+1)*incr; i2=(int)Math.min(Math.max(i2,0),N);
-			for (int i = i1; i < i2; i += incr) {
-				double x0 = SS.xvals.value1(i);
+			int incr = 1;
+			int tmp = 500;
+			if (N > tmp) {
+				incr = (int) Math.ceil(N * 1.0 / tmp);
+			}
+			for (int i = 0; i < N; i += incr) {
 				double minval = Double.POSITIVE_INFINITY;
 				double maxval = Double.NEGATIVE_INFINITY;
-				int incr2=1;
-				for (int j = 0; (j < incr) && (i + j < N); j+=incr2) {
+				for (int j = 0; (j < incr) && (i + j < N); j++) {
 					double val = SS.yvals.value1(i + j);
 					if (val < minval) {
 						minval = val;
@@ -1069,12 +999,12 @@ class PlotArea {
 						maxval = val;
 					}
 				}
+				double x0 = SS.xvals.value1(i);
 				double y1 = minval;
 				double y2 = maxval;
 				Vec2 pix1 = coordToPix(new Vec2(x0, y1));
 				Vec2 pix2 = coordToPix(new Vec2(x0, y2));
-				if (is_first) {
-					is_first=false;
+				if (i == 0) {
 					gc.moveTo(pix1.x, pix1.y);
 				} else {
 					gc.lineTo(pix1.x, pix1.y);
@@ -1084,19 +1014,6 @@ class PlotArea {
 				}
 			}
 			gc.stroke();
-		}
-		double elapsed=(System.nanoTime()-starttime0)*1.0/(1000*1000);
-		if (xmax<m_xmax) {
-			CallbackHandler.scheduleCallback(()->{
-				do_refresh(code, pr_index, xmax, gc);
-			},(int)elapsed);
-		}
-		else {
-			if ((incr>1)&&(pr_index+1<pix_res_values.length)) {
-				CallbackHandler.scheduleCallback(()->{
-					do_refresh(code, pr_index+1, m_xmin-1, gc);
-				},(int)elapsed+400); //add the 400 to give it some delay to enhance user experience
-			}
 		}
 	}
 
