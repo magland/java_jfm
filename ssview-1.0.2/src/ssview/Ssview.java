@@ -58,7 +58,6 @@ public class Ssview extends Application {
 		}
 		catch(Exception e) {
 			System.err.println(e.getMessage());
-			System.exit(-1);
 		}
 	}
 	

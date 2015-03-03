@@ -32,29 +32,6 @@ public class SSViewController {
 	public void showTimeSeries(String fname, String labels_fname, String labels2_fname) {
 		showTimeSeries(fname, labels_fname, labels2_fname, "");
 	}
-	
-	public SSTimeSeriesWidget createTimeSeriesWidget() {
-		Stage stage = new Stage();
-
-		SSTimeSeriesWidget WW = new SSTimeSeriesWidget();
-
-		StackPane root = new StackPane();
-		root.getChildren().add(WW);
-
-		Scene scene = new Scene(root, 1000, 500);
-
-		stage.setTitle("SSView");
-		stage.setScene(scene);
-		stage.show();
-		
-		return WW;
-	}
-	
-	public Mda readMda(String fname) {
-		Mda ret=new Mda();
-		ret.read(fname);
-		return ret;
-	}
 
 	public void showTimeSeries(String fname, String labels_fname, String labels2_fname, String labels3_fname) {
 		Stage stage = new Stage();
