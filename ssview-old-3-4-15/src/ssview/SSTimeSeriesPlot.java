@@ -43,7 +43,7 @@ class SSTimeSeriesPlot extends ExpandingCanvas {
 	int m_xrange_min = -1;
 	int m_xrange_max = -1;
 	boolean m_show_plots = true;
-	Color[] m_channel_colors = ViewColors.getViewColors(2);
+	Color[] m_channel_colors = ViewColors.getViewColors(1);
 	CallbackHandler CH=new CallbackHandler();
 
 	public SSTimeSeriesPlot() {

@@ -221,14 +221,12 @@ class SSTimeSeriesView extends StackPane {
 			} else {
 				move_current_x_coord(-1);
 			}
-			evt.consume();
 		} else if (evt.getCode().equals(KeyCode.RIGHT)) {
 			if (evt.isControlDown()) {
 				do_translate(+1);
 			} else {
 				move_current_x_coord(+1);
 			}
-			evt.consume();
 		} else if (evt.getCode().equals(KeyCode.UP)) {
 			if (this.currentChannel()+1<m_num_channels)
 				this.setCurrentChannel(this.currentChannel()+1);
@@ -481,8 +479,8 @@ class SSTimeSeriesView extends StackPane {
 
 		//current channel
 		if (m_current_channel>=0) {
-			gc.setFill(Color.LIGHTSALMON);
-			gc.setStroke(Color.LIGHTSALMON);
+			gc.setFill(Color.LIGHTGRAY);
+			gc.setStroke(Color.LIGHTGRAY);
 			gc.setLineWidth(2);
 			Rect RR = m_plot.channelToRect(m_current_channel);
 			//gc.strokeRect(RR.x, RR.y, RR.w, RR.h);
@@ -497,7 +495,7 @@ class SSTimeSeriesView extends StackPane {
 			p1.y = m_underlay.getHeight();
 
 			gc.beginPath();
-			gc.setStroke(Color.rgb(255,255,230));
+			gc.setStroke(Color.LIGHTBLUE);
 			gc.setLineWidth(2);
 			gc.moveTo(p0.x, p0.y);
 			gc.lineTo(p1.x, p1.y);
@@ -513,15 +511,15 @@ class SSTimeSeriesView extends StackPane {
 
 			if (m_cursor_visible) {
 				gc.beginPath();
-				gc.setStroke(Color.rgb(220,220,220));
-				gc.setLineWidth(4);
+				gc.setStroke(Color.GRAY);
+				gc.setLineWidth(5);
 				gc.moveTo(p0.x, p0.y);
 				gc.lineTo(p1.x, p1.y);
 				gc.stroke();
 
 				gc.beginPath();
-				gc.setStroke(Color.rgb(255,255,50));
-				gc.setLineWidth(2);
+				gc.setStroke(Color.LIGHTGRAY);
+				gc.setLineWidth(3);
 				gc.moveTo(p0.x, p0.y);
 				gc.lineTo(p1.x, p1.y);
 				gc.stroke();

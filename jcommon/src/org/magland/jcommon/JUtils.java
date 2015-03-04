@@ -6,6 +6,7 @@ import java.net.URL;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.dialog.Dialogs;
 
@@ -94,7 +95,13 @@ public class JUtils {
 		}
 	}
 
+	static public Stage popupWidgetModal(Node W,String title) {
+		return do_popup_widget(W,title,true);
+	}
 	static public Stage popupWidget(Node W, String title) {
+		return do_popup_widget(W,title,false);
+	}
+	static Stage do_popup_widget(Node W,String title,boolean modal) {
 		VBox root = new VBox();
 		root.getChildren().addAll(W);
 
@@ -104,6 +111,9 @@ public class JUtils {
 
 		Stage stage = new Stage();
 
+		if (modal) {
+			stage.initModality(Modality.APPLICATION_MODAL);
+		}
 		stage.setTitle(title);
 		stage.setScene(scene);
 		stage.show();
